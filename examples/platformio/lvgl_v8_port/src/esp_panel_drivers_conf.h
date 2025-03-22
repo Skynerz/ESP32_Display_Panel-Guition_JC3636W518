@@ -50,7 +50,7 @@
  * |   0   |   1   |                 Yes                 |              No            |
  * |   1   |   1   |                 Yes                 |              Yes           |
  */
-#define ESP_PANEL_DRIVERS_BUS_COMPILE_UNUSED_DRIVERS    (1)
+#define ESP_PANEL_DRIVERS_BUS_COMPILE_UNUSED_DRIVERS    (0)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// LCD Configurations ///////////////////////////////////////////////////
@@ -83,7 +83,7 @@
     #define ESP_PANEL_DRIVERS_LCD_USE_ST7789            (0)
     #define ESP_PANEL_DRIVERS_LCD_USE_ST7796            (0)
     #define ESP_PANEL_DRIVERS_LCD_USE_ST77903           (0)
-    #define ESP_PANEL_DRIVERS_LCD_USE_ST77916           (0)
+    #define ESP_PANEL_DRIVERS_LCD_USE_ST77916           (1)
     #define ESP_PANEL_DRIVERS_LCD_USE_ST77922           (0)
 #endif // ESP_PANEL_DRIVERS_LCD_USE_ALL
 
@@ -104,7 +104,7 @@
  * |   0   |   1   |                 Yes                 |              No            |
  * |   1   |   1   |                 Yes                 |              Yes           |
  */
-#define ESP_PANEL_DRIVERS_LCD_COMPILE_UNUSED_DRIVERS    (1)
+#define ESP_PANEL_DRIVERS_LCD_COMPILE_UNUSED_DRIVERS    (0)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// Touch Configurations /////////////////////////////////////////////////
@@ -125,7 +125,7 @@
 #if !ESP_PANEL_DRIVERS_TOUCH_USE_ALL
     #define ESP_PANEL_DRIVERS_TOUCH_USE_AXS15231B       (0)
     #define ESP_PANEL_DRIVERS_TOUCH_USE_CHSC6540        (0)
-    #define ESP_PANEL_DRIVERS_TOUCH_USE_CST816S         (0)
+    #define ESP_PANEL_DRIVERS_TOUCH_USE_CST816S         (1)
     #define ESP_PANEL_DRIVERS_TOUCH_USE_FT5x06          (0)
     #define ESP_PANEL_DRIVERS_TOUCH_USE_GT911           (0)
     #define ESP_PANEL_DRIVERS_TOUCH_USE_GT1151          (0)
@@ -154,7 +154,7 @@
  * |   0   |   1   |                 Yes                 |              No            |
  * |   1   |   1   |                 Yes                 |              Yes           |
  */
-#define ESP_PANEL_DRIVERS_TOUCH_COMPILE_UNUSED_DRIVERS          (1)
+#define ESP_PANEL_DRIVERS_TOUCH_COMPILE_UNUSED_DRIVERS          (0)
 
 #if ESP_PANEL_DRIVERS_TOUCH_USE_XPT2046 || ESP_PANEL_DRIVERS_TOUCH_COMPILE_UNUSED_DRIVERS
 /**
@@ -222,11 +222,11 @@
  * Enable or disable backlight drivers used in the factory class. Disable to reduce code size.
  * Set to `1` to enable, `0` to disable.
  */
-#define ESP_PANEL_DRIVERS_BACKLIGHT_USE_ALL                     (1)
+#define ESP_PANEL_DRIVERS_BACKLIGHT_USE_ALL                     (0)
 #if !ESP_PANEL_DRIVERS_BACKLIGHT_USE_ALL
     #define ESP_PANEL_DRIVERS_BACKLIGHT_USE_SWITCH_GPIO         (0)
     #define ESP_PANEL_DRIVERS_BACKLIGHT_USE_SWITCH_EXPANDER     (0)
-    #define ESP_PANEL_DRIVERS_BACKLIGHT_USE_PWM_LEDC            (0)
+    #define ESP_PANEL_DRIVERS_BACKLIGHT_USE_PWM_LEDC            (1)
     #define ESP_PANEL_DRIVERS_BACKLIGHT_USE_CUSTOM              (0)
 #endif // ESP_PANEL_DRIVERS_BACKLIGHT_USE_ALL
 
@@ -247,7 +247,7 @@
  * |   0   |   1   |                 Yes                 |              No            |
  * |   1   |   1   |                 Yes                 |              Yes           |
  */
-#define ESP_PANEL_DRIVERS_BACKLIGHT_COMPILE_UNUSED_DRIVERS     (1)
+#define ESP_PANEL_DRIVERS_BACKLIGHT_COMPILE_UNUSED_DRIVERS     (0)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// File Version ///////////////////////////////////////////////////////////

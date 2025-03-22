@@ -22,7 +22,7 @@
  *
  * Set to `1` to enable custom board configuration, `0` to disable
  */
-#define ESP_PANEL_BOARD_DEFAULT_USE_CUSTOM  (0)
+#define ESP_PANEL_BOARD_DEFAULT_USE_CUSTOM  (1)
 
 #if ESP_PANEL_BOARD_DEFAULT_USE_CUSTOM
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,13 +31,13 @@
 /**
  * @brief Board name (format: "Manufacturer:Model")
  */
-#define ESP_PANEL_BOARD_NAME                "Custom:Custom"
+#define ESP_PANEL_BOARD_NAME                "Guition:JC3636W518"
 
 /**
  * @brief Panel resolution configuration in pixels
  */
-#define ESP_PANEL_BOARD_WIDTH               (320)   // Panel width (horizontal, in pixels)
-#define ESP_PANEL_BOARD_HEIGHT              (240)   // Panel height (vertical, in pixels)
+#define ESP_PANEL_BOARD_WIDTH               (360)   // Panel width (horizontal, in pixels)
+#define ESP_PANEL_BOARD_HEIGHT              (360)   // Panel height (vertical, in pixels)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Please update the following macros to configure the LCD panel /////////////////////////////
@@ -47,7 +47,7 @@
  *
  * Set to `1` to enable LCD panel support, `0` to disable
  */
-#define ESP_PANEL_BOARD_USE_LCD             (0)
+#define ESP_PANEL_BOARD_USE_LCD             (1)
 
 #if ESP_PANEL_BOARD_USE_LCD
 /**
@@ -65,7 +65,7 @@
  * - `SPD2010`
  * - `ST7262`, `ST7701`, `ST7703`, `ST7789`, `ST7796`, `ST77903`, `ST77916`, `ST77922`
  */
-#define ESP_PANEL_BOARD_LCD_CONTROLLER      ILI9341
+#define ESP_PANEL_BOARD_LCD_CONTROLLER      ST77916
 
 /**
  * @brief LCD bus type selection
@@ -76,7 +76,7 @@
  * - `ESP_PANEL_BUS_TYPE_RGB` (ESP32-S3 only)
  * - `ESP_PANEL_BUS_TYPE_MIPI_DSI` (ESP32-P4 only)
  */
-#define ESP_PANEL_BOARD_LCD_BUS_TYPE        (ESP_PANEL_BUS_TYPE_SPI)
+#define ESP_PANEL_BOARD_LCD_BUS_TYPE        (ESP_PANEL_BUS_TYPE_QSPI)
 
 #if (ESP_PANEL_BOARD_LCD_BUS_TYPE == ESP_PANEL_BUS_TYPE_SPI) || \
     (ESP_PANEL_BOARD_LCD_BUS_TYPE == ESP_PANEL_BUS_TYPE_QSPI)
@@ -130,13 +130,13 @@
 #if !ESP_PANEL_BOARD_LCD_BUS_SKIP_INIT_HOST
     /* For host */
     #define ESP_PANEL_BOARD_LCD_QSPI_IO_SCK         (9)
-    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA0       (10)
-    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA1       (11)
-    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA2       (12)
-    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA3       (13)
+    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA0       (11)
+    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA1       (12)
+    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA2       (13)
+    #define ESP_PANEL_BOARD_LCD_QSPI_IO_DATA3       (14)
 #endif // ESP_PANEL_BOARD_LCD_BUS_SKIP_INIT_HOST
     /* For panel */
-    #define ESP_PANEL_BOARD_LCD_QSPI_IO_CS          (5)     // -1 if not used
+    #define ESP_PANEL_BOARD_LCD_QSPI_IO_CS          (10)     // -1 if not used
     #define ESP_PANEL_BOARD_LCD_QSPI_MODE           (0)     // 0-3, typically set to 0
     #define ESP_PANEL_BOARD_LCD_QSPI_CLK_HZ         (40 * 1000 * 1000)
                                                             // Should be an integer divisor of 80M, typically set to 40M
@@ -337,7 +337,7 @@
  *
  * Set to `1` to enable touch panel support, `0` to disable
  */
-#define ESP_PANEL_BOARD_USE_TOUCH               (0)
+#define ESP_PANEL_BOARD_USE_TOUCH               (1)
 
 #if ESP_PANEL_BOARD_USE_TOUCH
 /**
@@ -355,7 +355,7 @@
  * - `TT21100`
  * - `XPT2046`
  */
-#define ESP_PANEL_BOARD_TOUCH_CONTROLLER        TT21100
+#define ESP_PANEL_BOARD_TOUCH_CONTROLLER        CST816S
 
 /**
  * @brief Touch bus type selection
@@ -394,8 +394,8 @@
                                                                 // Typically set to 400K
     #define ESP_PANEL_BOARD_TOUCH_I2C_SCL_PULLUP        (1)     // 0/1. Typically set to 1
     #define ESP_PANEL_BOARD_TOUCH_I2C_SDA_PULLUP        (1)     // 0/1. Typically set to 1
-    #define ESP_PANEL_BOARD_TOUCH_I2C_IO_SCL            (18)
-    #define ESP_PANEL_BOARD_TOUCH_I2C_IO_SDA            (8)
+    #define ESP_PANEL_BOARD_TOUCH_I2C_IO_SCL            (8)
+    #define ESP_PANEL_BOARD_TOUCH_I2C_IO_SDA            (7)
 #endif
     /* For panel */
     #define ESP_PANEL_BOARD_TOUCH_I2C_ADDRESS           (0)     // Typically set to 0 to use the default address.
@@ -437,7 +437,7 @@
 /**
  * @brief Touch panel control pins
  */
-#define ESP_PANEL_BOARD_TOUCH_RST_IO            (-1)    // Reset pin, -1 if not used
+#define ESP_PANEL_BOARD_TOUCH_RST_IO            (47)    // Reset pin, -1 if not used
 #define ESP_PANEL_BOARD_TOUCH_RST_LEVEL         (0)     // Reset active level, 0: low, 1: high
 #define ESP_PANEL_BOARD_TOUCH_INT_IO            (-1)    // Interrupt pin, -1 if not used
 #define ESP_PANEL_BOARD_TOUCH_INT_LEVEL         (0)     // Interrupt active level, 0: low, 1: high
@@ -452,7 +452,7 @@
  *
  * Set to `1` to enable backlight support, `0` to disable
  */
-#define ESP_PANEL_BOARD_USE_BACKLIGHT           (0)
+#define ESP_PANEL_BOARD_USE_BACKLIGHT           (1)
 
 #if ESP_PANEL_BOARD_USE_BACKLIGHT
 /**
@@ -473,7 +473,7 @@
     /**
      * @brief Backlight control pin configuration
      */
-    #define ESP_PANEL_BOARD_BACKLIGHT_IO        (38)    // Output GPIO pin number
+    #define ESP_PANEL_BOARD_BACKLIGHT_IO        (15)    // Output GPIO pin number
     #define ESP_PANEL_BOARD_BACKLIGHT_ON_LEVEL  (1)     // Active level, 0: low, 1: high
 
 #elif ESP_PANEL_BOARD_BACKLIGHT_TYPE == ESP_PANEL_BACKLIGHT_TYPE_CUSTOM
@@ -544,8 +544,8 @@
                                                             // Typically set to 400K
 #define ESP_PANEL_BOARD_EXPANDER_I2C_SCL_PULLUP     (1)     // 0/1. Typically set to 1
 #define ESP_PANEL_BOARD_EXPANDER_I2C_SDA_PULLUP     (1)     // 0/1. Typically set to 1
-#define ESP_PANEL_BOARD_EXPANDER_I2C_IO_SCL         (18)
-#define ESP_PANEL_BOARD_EXPANDER_I2C_IO_SDA         (8)
+#define ESP_PANEL_BOARD_EXPANDER_I2C_IO_SCL         (8)
+#define ESP_PANEL_BOARD_EXPANDER_I2C_IO_SDA         (7)
 #endif // ESP_PANEL_BOARD_EXPANDER_SKIP_INIT_HOST
 /* For device */
 #define ESP_PANEL_BOARD_EXPANDER_I2C_ADDRESS        (0x20)  // The actual I2C address. Even for the same model of IC,
