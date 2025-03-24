@@ -324,7 +324,7 @@
 /**
  * @brief LCD reset pin configuration
  */
-#define ESP_PANEL_BOARD_LCD_RST_IO              (-1)    // Reset pin, -1 if not used
+#define ESP_PANEL_BOARD_LCD_RST_IO              (47)    // Reset pin, -1 if not used
 #define ESP_PANEL_BOARD_LCD_RST_LEVEL           (0)     // Reset active level, 0: low, 1: high
 
 #endif // ESP_PANEL_BOARD_USE_LCD
@@ -437,9 +437,9 @@
 /**
  * @brief Touch panel control pins
  */
-#define ESP_PANEL_BOARD_TOUCH_RST_IO            (47)    // Reset pin, -1 if not used
+#define ESP_PANEL_BOARD_TOUCH_RST_IO            (40)    // Reset pin, -1 if not used
 #define ESP_PANEL_BOARD_TOUCH_RST_LEVEL         (0)     // Reset active level, 0: low, 1: high
-#define ESP_PANEL_BOARD_TOUCH_INT_IO            (-1)    // Interrupt pin, -1 if not used
+#define ESP_PANEL_BOARD_TOUCH_INT_IO            (41)    // Interrupt pin, -1 if not used
 #define ESP_PANEL_BOARD_TOUCH_INT_LEVEL         (0)     // Interrupt active level, 0: low, 1: high
 
 #endif // ESP_PANEL_BOARD_USE_TOUCH
