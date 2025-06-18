@@ -9,6 +9,12 @@
 #include <lvgl.h>
 #include "lvgl_v8_port.h"
 
+#include <WiFi.h>
+#include <WebServer.h>
+
+const char* ssid = "Beelight";
+const char* password = "password";
+
 /**
 /* To use the built-in examples and demos of LVGL uncomment the includes below respectively.
  * You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.
@@ -19,7 +25,10 @@
 using namespace esp_panel::drivers;
 using namespace esp_panel::board;
 
-void custom_init();
+
+/* ==================== DEfS ==================== */
+void ui_init();
+void server_init();
 
 // Example: Create a label
 static lv_obj_t *pointer;
@@ -29,6 +38,11 @@ static lv_obj_t *labelX;
 
 // Add Y label
 static lv_obj_t *labelY;
+
+static lv_obj_t *labelRemote;
+
+WebServer server(80);
+
 
 void setup()
 {
@@ -71,7 +85,8 @@ void setup()
      * source codes: https://github.com/lvgl/lvgl/tree/e7f88efa5853128bf871dde335c0ca8da9eb7731/examples
      */
     // lv_example_btn_1();
-    custom_init();
+    ui_init();
+    server_init();
 
     /**
      * Or try out a demo.
@@ -88,7 +103,7 @@ void setup()
 
 void loop()
 {
-    Serial.println("IDLE loop");
+    server.handleClient();    
     delay(1000);
 }
 
@@ -129,6 +144,58 @@ void loop()
 
 // -------------------------------
 
+static void server_handle_root()
+{
+    server.send(200, "text/html", "<h1>Hello from ESP32</h1>");
+    if (server.method() == HTTP_POST) {
+        if (server.args() > 0) {
+            String payload = server.arg(0);
+            Serial.println("Received POST payload:");
+            Serial.println(payload);
+            lv_label_set_text_fmt(labelRemote, payload.c_str());
+        } else {
+            Serial.println("No plain text payload received in POST request.");
+            lv_label_set_text_fmt(labelRemote, "Request received with no content!");
+        }
+    }
+}
+
+static void server_handle_not_found()
+{
+    String message = "File Not Found\n\n";
+    message += "URI: ";
+    message += server.uri();
+    message += "\nMethod: ";
+    message += (server.method() == HTTP_GET) ? "GET" : "POST";
+    message += "\nArguments: ";
+    message += server.args();
+    message += "\n";
+
+    for (uint8_t i = 0; i < server.args(); i++) {
+        message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+    }
+
+    server.send(404, "text/plain", message);
+}
+
+
+static void server_handler_picture()
+{ 
+    // Display the picture received from the client
+    if (server.method() == HTTP_POST) {
+        if (server.args() > 0) {
+            String payload = server.arg(0);
+            Serial.println("Received POST payload:");
+            Serial.println(payload);
+            lv_label_set_text_fmt(labelRemote, payload.c_str());
+        } else {
+            Serial.println("No plain text payload received in POST request.");
+            lv_label_set_text_fmt(labelRemote, "Request received with no content!");
+        }
+    }
+
+
+}
 
 static void sliderX_event_handler(lv_event_t * e)
 {
@@ -138,7 +205,7 @@ static void sliderX_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * slider = lv_event_get_target(e);
         int16_t value = lv_slider_get_value(slider);
-        Serial.printf("Slider value: %d\n", value);
+        // Serial.printf("Slider value: %d\n", value);
 
         lv_obj_set_x(pointer, value);
         lv_label_set_text_fmt(labelX, "X=%d", value);
@@ -153,36 +220,58 @@ static void sliderY_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * slider = lv_event_get_target(e);
         int16_t value = lv_slider_get_value(slider);
-        Serial.printf("Slider value: %d\n", value);
+        // Serial.printf("Slider value: %d\n", value);
 
         lv_obj_set_y(pointer, value);
         lv_label_set_text_fmt(labelY, "Y=%d", value);
     }
 } 
 
-void custom_init()
+void server_init()
+{
+    WiFi.softAP(ssid, password);
+    Serial.println("WiFi AP started with credentials:");
+    Serial.printf("SSID: %s\n", ssid);
+    Serial.printf("Password: %s\n", password);
+    Serial.printf("IP Address: %s\n", WiFi.softAPIP().toString().c_str());
+    Serial.println("Starting server...");
+
+    server.on("/", server_handle_root);
+    server.onNotFound(server_handle_not_found);
+    server.on("/text", server_handler_picture);
+    server.on("/text", HTTP_GET, []() {
+        server.send(200, "text/plain", "Hello from ESP32");
+    });
+
+    server.begin();
+    Serial.println("HTTP server started");
+}
+
+void ui_init()
 {
     // Custom initialization code here
     Serial.println("Custom initialization");
 
     pointer = lv_label_create(lv_scr_act());
-
-    labelX = lv_label_create(lv_scr_act());
-
-    labelY = lv_label_create(lv_scr_act());
-
     lv_label_set_text(pointer, "+");
     lv_obj_set_style_text_color(pointer, lv_color_hex(0x00FF00), 0);
     lv_obj_set_style_text_font(pointer, &lv_font_montserrat_30, 0);
     lv_obj_align(pointer, LV_ALIGN_CENTER, 0, -20);
 
+    labelX = lv_label_create(lv_scr_act());
     lv_label_set_text(labelX, "X=");
     lv_obj_set_style_text_font(labelX, &lv_font_montserrat_12, 0);
     lv_obj_align(labelX, LV_ALIGN_CENTER, 0, -12);
 
+    labelY = lv_label_create(lv_scr_act());
     lv_label_set_text(labelY, "Y=");
     lv_obj_set_style_text_font(labelY, &lv_font_montserrat_12, 0);
     lv_obj_align(labelY, LV_ALIGN_CENTER, 0, 12);
+
+    labelRemote = lv_label_create(lv_scr_act());
+    lv_label_set_text(labelRemote, "placeholder");
+    lv_obj_set_style_text_font(labelRemote, &lv_font_montserrat_12, 0);
+    lv_obj_align(labelRemote, LV_ALIGN_CENTER, 0, -20);
 
     //Add a sliderX
     lv_obj_t *sliderX = lv_slider_create(lv_scr_act());
