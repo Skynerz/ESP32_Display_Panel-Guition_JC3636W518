@@ -280,8 +280,18 @@ void ble_init()
     pCharacteristic->setCallbacks(new TextCallback());
 
     pService->start();
+    Serial.println("BLE Service started");
     NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
+
+    // Définir le nom dans les paquets d'annonce
+    pAdvertising->setName("BeeLight"); // Nom visible sur Android
+    pAdvertising->enableScanResponse(true);
+    pAdvertising->setAppearance(0x1440); // Optionnel : type générique
+    pAdvertising->addServiceUUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E"); // Votre UUID
+    pAdvertising->setPreferredParams(0x06, 0x12);  // Recommandé
+
     pAdvertising->start();
+    Serial.println("BLE Advertising started");
 
     lv_label_set_text_fmt(labelRemoteMessage, "%s", NimBLEDevice::getAddress().toString().c_str());
 }
