@@ -39,7 +39,7 @@ static lv_obj_t *labelX;
 // Add Y label
 static lv_obj_t *labelY;
 
-static lv_obj_t *labelRemote;
+static lv_obj_t *labelRemoteMessage;
 
 WebServer server(80);
 
@@ -147,16 +147,19 @@ void loop()
 static void server_handle_root()
 {
     server.send(200, "text/html", "<h1>Hello from ESP32</h1>");
-    if (server.method() == HTTP_POST) {
-        if (server.args() > 0) {
-            String payload = server.arg(0);
-            Serial.println("Received POST payload:");
-            Serial.println(payload);
-            lv_label_set_text_fmt(labelRemote, payload.c_str());
-        } else {
-            Serial.println("No plain text payload received in POST request.");
-            lv_label_set_text_fmt(labelRemote, "Request received with no content!");
-        }
+    switch (server.method())
+    {
+        case HTTP_POST:
+            Serial.println("Received POST request");
+            // Handle POST request
+            lv_label_set_text_fmt(labelRemoteMessage, "%s", server.arg(0));
+            break;
+        case HTTP_GET:
+            Serial.println("Received GET request");
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -187,14 +190,12 @@ static void server_handler_picture()
             String payload = server.arg(0);
             Serial.println("Received POST payload:");
             Serial.println(payload);
-            lv_label_set_text_fmt(labelRemote, payload.c_str());
+            lv_label_set_text_fmt(labelRemoteMessage, payload.c_str());
         } else {
             Serial.println("No plain text payload received in POST request.");
-            lv_label_set_text_fmt(labelRemote, "Request received with no content!");
+            lv_label_set_text_fmt(labelRemoteMessage, "Request received with no content!");
         }
     }
-
-
 }
 
 static void sliderX_event_handler(lv_event_t * e)
@@ -238,9 +239,10 @@ void server_init()
 
     server.on("/", server_handle_root);
     server.onNotFound(server_handle_not_found);
-    server.on("/text", server_handler_picture);
+    server.on("/pic", server_handler_picture);
     server.on("/text", HTTP_GET, []() {
         server.send(200, "text/plain", "Hello from ESP32");
+        Serial.println("Received POST /text");
     });
 
     server.begin();
@@ -268,10 +270,10 @@ void ui_init()
     lv_obj_set_style_text_font(labelY, &lv_font_montserrat_12, 0);
     lv_obj_align(labelY, LV_ALIGN_CENTER, 0, 12);
 
-    labelRemote = lv_label_create(lv_scr_act());
-    lv_label_set_text(labelRemote, "placeholder");
-    lv_obj_set_style_text_font(labelRemote, &lv_font_montserrat_12, 0);
-    lv_obj_align(labelRemote, LV_ALIGN_CENTER, 0, -20);
+    labelRemoteMessage = lv_label_create(lv_scr_act());
+    lv_label_set_text(labelRemoteMessage, "placeholder");
+    lv_obj_set_style_text_font(labelRemoteMessage, &lv_font_montserrat_20, 0);
+    lv_obj_align(labelRemoteMessage, LV_ALIGN_CENTER, 0, -50);
 
     //Add a sliderX
     lv_obj_t *sliderX = lv_slider_create(lv_scr_act());
