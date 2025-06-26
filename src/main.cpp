@@ -12,6 +12,8 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
+#include <NimBLEDevice.h>
+
 const char* ssid = "Beelight";
 const char* password = "password";
 
@@ -29,6 +31,7 @@ using namespace esp_panel::board;
 /* ==================== DEfS ==================== */
 void ui_init();
 void server_init();
+void ble_init();
 
 // Example: Create a label
 static lv_obj_t *pointer;
@@ -86,7 +89,8 @@ void setup()
      */
     // lv_example_btn_1();
     ui_init();
-    server_init();
+    // server_init();
+    ble_init();
 
     /**
      * Or try out a demo.
@@ -247,6 +251,39 @@ void server_init()
 
     server.begin();
     Serial.println("HTTP server started");
+}
+
+void ble_init()
+{
+    NimBLEDevice::init("BeeLight"); // Nom visible sur Android
+
+    NimBLEServer *pServer = NimBLEDevice::createServer();
+    NimBLEService *pService = pServer->createService("6E400001-B5A3-F393-E0A9-E50E24DCCA9E"); // UART Service
+
+    NimBLECharacteristic *pCharacteristic = pService->createCharacteristic(
+        "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",  // RX
+        NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR
+    );
+
+    // Callback : exécution quand texte reçu
+    class TextCallback : public NimBLECharacteristicCallbacks {
+        void onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo &connInfo)
+        {
+            std::string value = pCharacteristic->getValue();
+            Serial.print("Texte reçu : ");
+            Serial.println(value.c_str());
+            // Ici, afficher sur l'écran :
+            lv_label_set_text_fmt(labelRemoteMessage, "%s", value.c_str());
+        }
+    };
+
+    pCharacteristic->setCallbacks(new TextCallback());
+
+    pService->start();
+    NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
+    pAdvertising->start();
+
+    lv_label_set_text_fmt(labelRemoteMessage, "%s", NimBLEDevice::getAddress().toString().c_str());
 }
 
 void ui_init()
