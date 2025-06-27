@@ -16,6 +16,10 @@
 
 const char* ssid = "Beelight";
 const char* password = "password";
+const char *NORDIC_UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+const char *NORDIC_UART_SERVICE_UUID_TX = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
+const char *NORDIC_UART_SERVICE_UUID_RX = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+
 
 /**
 /* To use the built-in examples and demos of LVGL uncomment the includes below respectively.
@@ -63,24 +67,6 @@ void setup()
     /* Lock the mutex due to the LVGL APIs are not thread-safe */
     lvgl_port_lock(-1);
 
-    // /**
-    //  * Create the simple labels
-    //  */
-    // lv_obj_t *label_1 = lv_label_create(lv_scr_act());
-    // lv_label_set_text(label_1, "Hello World!");
-    // lv_obj_set_style_text_font(label_1, &lv_font_montserrat_30, 0);
-    // lv_obj_align(label_1, LV_ALIGN_CENTER, 0, -20);
-    // lv_obj_t *label_2 = lv_label_create(lv_scr_act());
-    // lv_label_set_text_fmt(
-    //     label_2, "ESP32_Display_Panel(%d.%d.%d)",
-    //     ESP_PANEL_VERSION_MAJOR, ESP_PANEL_VERSION_MINOR, ESP_PANEL_VERSION_PATCH
-    // );
-    // lv_obj_set_style_text_font(label_2, &lv_font_montserrat_16, 0);
-    // lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
-    // lv_obj_t *label_3 = lv_label_create(lv_scr_act());
-    // lv_label_set_text_fmt(label_3, "LVGL(%d.%d.%d)", LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
-    // lv_obj_set_style_text_font(label_3, &lv_font_montserrat_16, 0);
-    // lv_obj_align_to(label_3, label_2, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     /**
      * Try an example. Don't forget to uncomment header.
@@ -92,14 +78,6 @@ void setup()
     // server_init();
     ble_init();
 
-    /**
-     * Or try out a demo.
-     * Don't forget to uncomment header and enable the demos in `lv_conf.h`. E.g. `LV_USE_DEMO_WIDGETS`
-     */
-    // lv_demo_widgets();
-    // lv_demo_benchmark();
-    // lv_demo_music();
-    // lv_demo_stress();
 
     /* Release the mutex */
     lvgl_port_unlock();
@@ -110,43 +88,6 @@ void loop()
     server.handleClient();    
     delay(1000);
 }
-
-// static void event_handler(lv_event_t * e)
-// {
-//     lv_event_code_t code = lv_event_get_code(e);
-
-//     if(code == LV_EVENT_CLICKED) {
-//         LV_LOG_USER("Clicked");
-//     }
-//     else if(code == LV_EVENT_VALUE_CHANGED) {
-//         LV_LOG_USER("Toggled");
-//     }
-// }
-
-// void lv_example_btn_1(void)
-// {
-//     lv_obj_t * label;
-
-//     // lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
-//     // lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, NULL);
-//     // lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -40);
-
-//     // label = lv_label_create(btn1);
-//     // lv_label_set_text(label, "Button");
-//     // lv_obj_center(label);
-
-//     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
-//     lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, NULL);
-//     lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
-//     lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-//     lv_obj_set_height(btn2, LV_SIZE_CONTENT);
-
-//     label = lv_label_create(btn2);
-//     lv_label_set_text(label, "Toggle");
-//     lv_obj_center(label);
-// }
-
-// -------------------------------
 
 static void server_handle_root()
 {
@@ -255,24 +196,24 @@ void server_init()
 
 void ble_init()
 {
-    NimBLEDevice::init("BeeLight"); // Nom visible sur Android
+    NimBLEDevice::init("BeeLight"); // Name of the device
 
     NimBLEServer *pServer = NimBLEDevice::createServer();
-    NimBLEService *pService = pServer->createService("6E400001-B5A3-F393-E0A9-E50E24DCCA9E"); // UART Service
+    NimBLEService *pService = pServer->createService(NORDIC_UART_SERVICE_UUID);
 
     NimBLECharacteristic *pCharacteristic = pService->createCharacteristic(
-        "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",  // RX
+        NORDIC_UART_SERVICE_UUID_RX,  // RX
         NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR
     );
 
-    // Callback : exécution quand texte reçu
+    // callback for receiving text
     class TextCallback : public NimBLECharacteristicCallbacks {
         void onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo &connInfo)
         {
             std::string value = pCharacteristic->getValue();
             Serial.print("Texte reçu : ");
             Serial.println(value.c_str());
-            // Ici, afficher sur l'écran :
+            // Print on display
             lv_label_set_text_fmt(labelRemoteMessage, "%s", value.c_str());
         }
     };
@@ -283,12 +224,12 @@ void ble_init()
     Serial.println("BLE Service started");
     NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
 
-    // Définir le nom dans les paquets d'annonce
-    pAdvertising->setName("BeeLight"); // Nom visible sur Android
+    // Advertising packet configuration
+    pAdvertising->setName("BeeLight");
     pAdvertising->enableScanResponse(true);
-    pAdvertising->setAppearance(0x1440); // Optionnel : type générique
-    pAdvertising->addServiceUUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E"); // Votre UUID
-    pAdvertising->setPreferredParams(0x06, 0x12);  // Recommandé
+    pAdvertising->setAppearance(0x1442);
+    pAdvertising->addServiceUUID(NORDIC_UART_SERVICE_UUID);
+    pAdvertising->setPreferredParams(0x06, 0x12);
 
     pAdvertising->start();
     Serial.println("BLE Advertising started");
